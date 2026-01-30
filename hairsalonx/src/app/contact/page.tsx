@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import GoogleMaps from '@/components/GoogleMaps'
 
 export const metadata: Metadata = {
   title: 'Contact & Boeken — HairsalonX | Kapper Roermond',
@@ -57,10 +58,12 @@ export default function ContactPage() {
                 </a>
               </div>
 
-              <div className="mt-8 p-6 rounded-xl bg-neutral-50">
+              <div className="mt-8">
                 <h3 className="font-display text-lg font-semibold text-neutral-900 mb-4">📍 Locatie</h3>
-                <p className="text-neutral-600">Roermond, Limburg</p>
-                <p className="text-neutral-400 text-sm mt-2">Exact adres wordt binnenkort toegevoegd</p>
+                <GoogleMaps address="Roermond, Limburg" />
+                <p className="text-neutral-400 text-sm mt-2">
+                  Exact adres volgt (binnenkort te updaten door Josje)
+                </p>
               </div>
             </div>
 
