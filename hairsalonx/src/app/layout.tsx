@@ -3,6 +3,7 @@ import './globals.css'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import WhatsAppButton from '@/components/WhatsAppButton'
+import StructuredData from '@/components/StructuredData'
 
 export const metadata: Metadata = {
   title: 'HairsalonX — Haar zoals je het nog niet kende | Kapper Roermond',
@@ -26,6 +27,7 @@ export default function RootLayout({
   return (
     <html lang="nl">
       <body>
+        <StructuredData />
         <Navbar />
         <main>{children}</main>
         <Footer />
