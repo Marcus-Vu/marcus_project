@@ -3,19 +3,26 @@ import Image from 'next/image'
 
 function HeroSection() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-blush-light to-warm-50">
-      <div className="absolute inset-0 bg-[url('/hero-pattern.svg')] opacity-5" />
+    <section className="relative min-h-screen flex items-center justify-center">
+      <Image
+        src="/images/hero-salon.jpg"
+        alt="HairsalonX salon interieur"
+        fill
+        className="object-cover"
+        priority
+      />
+      <div className="absolute inset-0 bg-black/40" />
       <div className="container-narrow mx-auto px-4 md:px-8 text-center relative z-10 pt-20">
         <p className="text-gold font-display italic text-lg md:text-xl mb-4 animate-fade-in">
           Welkom bij
         </p>
-        <h1 className="font-display text-5xl md:text-7xl font-bold text-neutral-900 mb-6 leading-tight">
-          Hairsalon<span className="text-primary-500">X</span>
+        <h1 className="font-display text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+          Hairsalon<span className="text-primary-300">X</span>
         </h1>
-        <p className="font-display text-xl md:text-2xl text-neutral-600 italic mb-8 max-w-2xl mx-auto">
+        <p className="font-display text-xl md:text-2xl text-white/80 italic mb-8 max-w-2xl mx-auto">
           Haar zoals je het nog niet kende
         </p>
-        <p className="text-neutral-500 text-lg mb-10 max-w-xl mx-auto leading-relaxed">
+        <p className="text-white/70 text-lg mb-10 max-w-xl mx-auto leading-relaxed">
           Persoonlijke aandacht in een warme, ontspannen sfeer in Roermond.
           Krullen, extensions, kleur of een frisse coupe — jij bent welkom.
         </p>
@@ -81,7 +88,7 @@ function AboutPreview() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div className="aspect-[4/5] relative rounded-2xl overflow-hidden">
             <Image
-              src="/images/josje-portrait.png"
+              src="/images/josje-portrait.jpg"
               alt="Josje - eigenaar van HairsalonX"
               fill
               className="object-cover"

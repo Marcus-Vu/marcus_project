@@ -15,7 +15,7 @@ export default function OverPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div className="aspect-[4/5] relative rounded-2xl overflow-hidden order-2 md:order-1">
               <Image
-                src="/images/josje-portrait.png"
+                src="/images/josje-portrait.jpg"
                 alt="Josje - eigenaar van HairsalonX"
                 fill
                 className="object-cover"

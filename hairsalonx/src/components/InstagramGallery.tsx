@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 
 // Static gallery data — easy to swap to real Instagram API later
 // Replace these with actual Instagram post data when API is connected
@@ -11,6 +12,7 @@ const INSTAGRAM_POSTS = [
     category: 'Krullen',
     gradient: 'from-amber-200 to-rose-200',
     emoji: '🌀',
+    image: '/images/curls-result.jpg',
   },
   {
     id: '2',
@@ -18,6 +20,7 @@ const INSTAGRAM_POSTS = [
     category: 'Kleuren',
     gradient: 'from-purple-200 to-pink-200',
     emoji: '🎨',
+    image: '/images/color-result.jpg',
   },
   {
     id: '3',
@@ -25,6 +28,7 @@ const INSTAGRAM_POSTS = [
     category: 'Extensions',
     gradient: 'from-rose-200 to-orange-200',
     emoji: '✨',
+    image: '/images/extensions-result.jpg',
   },
   {
     id: '4',
@@ -128,17 +132,20 @@ export default function InstagramGallery() {
           <button
             key={post.id}
             onClick={() => setSelectedPost(post)}
-            className={`group relative aspect-square rounded-xl bg-gradient-to-br ${post.gradient} overflow-hidden transition-transform duration-200 hover:scale-[1.02] hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:ring-offset-2`}
+            className={`group relative aspect-square rounded-xl ${post.image ? '' : `bg-gradient-to-br ${post.gradient}`} overflow-hidden transition-transform duration-200 hover:scale-[1.02] hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:ring-offset-2`}
           >
-            {/* Placeholder content — replace with <Image> when real photos arrive */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center p-4">
-              <span className="text-4xl md:text-5xl mb-2 group-hover:scale-110 transition-transform duration-200">
-                {post.emoji}
-              </span>
-              <span className="text-xs text-neutral-700 font-medium opacity-70">
-                {post.category}
-              </span>
-            </div>
+            {post.image ? (
+              <Image src={post.image} alt={post.caption} fill className="object-cover" />
+            ) : (
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-4">
+                <span className="text-4xl md:text-5xl mb-2 group-hover:scale-110 transition-transform duration-200">
+                  {post.emoji}
+                </span>
+                <span className="text-xs text-neutral-700 font-medium opacity-70">
+                  {post.category}
+                </span>
+              </div>
+            )}
 
             {/* Hover overlay */}
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
@@ -164,18 +171,21 @@ export default function InstagramGallery() {
           onClick={() => setSelectedPost(null)}
         >
           <div
-            className={`relative w-full max-w-lg aspect-square rounded-2xl bg-gradient-to-br ${selectedPost.gradient} flex flex-col items-center justify-center p-8`}
+            className={`relative w-full max-w-lg aspect-square rounded-2xl ${selectedPost.image ? '' : `bg-gradient-to-br ${selectedPost.gradient}`} flex flex-col items-center justify-center p-8 overflow-hidden`}
             onClick={e => e.stopPropagation()}
           >
+            {selectedPost.image && (
+              <Image src={selectedPost.image} alt={selectedPost.caption} fill className="object-cover" />
+            )}
             <button
               onClick={() => setSelectedPost(null)}
-              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-black/20 text-white flex items-center justify-center hover:bg-black/40 transition-colors"
+              className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-black/20 text-white flex items-center justify-center hover:bg-black/40 transition-colors"
               aria-label="Sluiten"
             >
               ✕
             </button>
-            <span className="text-7xl mb-4">{selectedPost.emoji}</span>
-            <p className="text-neutral-800 text-center font-medium text-lg mb-2">
+            {!selectedPost.image && <span className="text-7xl mb-4">{selectedPost.emoji}</span>}
+            <p className={`${selectedPost.image ? 'absolute bottom-16 z-10 text-white drop-shadow-lg' : 'text-neutral-800'} text-center font-medium text-lg mb-2`}>
               {selectedPost.caption}
             </p>
             <span className="text-sm text-neutral-600 bg-white/50 px-3 py-1 rounded-full">
