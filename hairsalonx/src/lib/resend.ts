@@ -14,9 +14,13 @@
 
 import { Resend } from 'resend'
 
-// Initialize Resend with API key
+// Initialize Resend with API key (only on server-side)
 const resendApiKey = process.env.RESEND_API_KEY || ''
-export const resend = resendApiKey ? new Resend(resendApiKey) : null
+
+// Create Resend instance only if API key is available (server-side)
+export const resend = (typeof window === 'undefined' && resendApiKey) 
+  ? new Resend(resendApiKey) 
+  : null
 
 // Email addresses
 export const ADMIN_EMAIL = 'info@hairsalonx.nl'

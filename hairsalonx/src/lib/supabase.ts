@@ -10,18 +10,32 @@
  * @see https://supabase.com/docs/reference/javascript/initializing
  */
 
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
 // Environment variables for Supabase connection
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 
+// Create a mock client for build-time when env vars are not set
+function createMockClient(): SupabaseClient {
+  return new Proxy({} as SupabaseClient, {
+    get() {
+      return () => ({
+        data: null,
+        error: new Error('Supabase not configured'),
+      })
+    },
+  })
+}
+
 // Client-side Supabase client (uses anon key)
-export const supabaseClient = createClient(supabaseUrl, supabaseAnonKey)
+export const supabaseClient = supabaseUrl && supabaseAnonKey
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : createMockClient()
 
 // Server-side Supabase client (uses service role key for admin operations)
-export const supabaseAdmin = supabaseServiceKey 
+export const supabaseAdmin = supabaseUrl && supabaseServiceKey
   ? createClient(supabaseUrl, supabaseServiceKey)
   : supabaseClient
 
