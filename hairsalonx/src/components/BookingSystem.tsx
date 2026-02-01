@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
 interface Service {
@@ -28,14 +28,6 @@ const services: Service[] = [
   { id: 'extensions', name: 'Extensions (op aanvraag)', duration: '180 min', price: 'Op aanvraag', category: 'Extensions' },
 ]
 
-const timeSlots = [
-  '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-  '12:00', '12:30', '13:30', '14:00', '14:30', '15:00',
-  '15:30', '16:00', '16:30', '17:00', '17:30',
-  // Donderdag avond
-  '18:00', '18:30', '19:00', '19:30'
-]
-
 export default function BookingSystem() {
   const router = useRouter()
   const [step, setStep] = useState(1)
@@ -44,6 +36,9 @@ export default function BookingSystem() {
   const [selectedTime, setSelectedTime] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [apiError, setApiError] = useState<string | null>(null)
+  const [availableSlots, setAvailableSlots] = useState<string[]>([])
+  const [isLoadingSlots, setIsLoadingSlots] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -85,37 +80,84 @@ export default function BookingSystem() {
     }
   }
 
+  // Fetch available time slots when date changes
+  useEffect(() => {
+    if (!selectedDate) {
+      setAvailableSlots([])
+      return
+    }
+
+    const fetchAvailability = async () => {
+      setIsLoadingSlots(true)
+      setSelectedTime('')
+      
+      try {
+        const response = await fetch(`/api/availability?date=${selectedDate}`)
+        const data = await response.json()
+        
+        if (response.ok) {
+          setAvailableSlots(data.availableSlots || [])
+        } else {
+          setApiError(data.error || 'Failed to load available times')
+          setAvailableSlots([])
+        }
+      } catch (error) {
+        console.error('Error fetching availability:', error)
+        setApiError('Failed to load available times')
+        setAvailableSlots([])
+      } finally {
+        setIsLoadingSlots(false)
+      }
+    }
+
+    fetchAvailability()
+  }, [selectedDate])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     if (!validateForm()) return
     
     setIsSubmitting(true)
+    setApiError(null)
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
-    // TODO: Replace with actual API call
-    // const response = await fetch('/api/bookings', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({
-    //     service: selectedService,
-    //     date: selectedDate,
-    //     time: selectedTime,
-    //     customer: formData
-    //   })
-    // })
-    
-    console.log('Booking submitted:', {
-      service: selectedService,
-      date: selectedDate,
-      time: selectedTime,
-      customer: formData
-    })
-    
-    setIsSubmitting(false)
-    setStep(4)
+    try {
+      const response = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          service: selectedService,
+          date: selectedDate,
+          time: selectedTime,
+          customer: formData
+        })
+      })
+      
+      const data = await response.json()
+      
+      if (response.ok) {
+        // Booking successful
+        setStep(4)
+      } else if (response.status === 409) {
+        // Time slot already booked
+        setApiError('Deze tijd is helaas net gereserveerd. Kies een andere tijd.')
+        setStep(2)
+        // Refresh available slots
+        const availabilityResponse = await fetch(`/api/availability?date=${selectedDate}`)
+        const availabilityData = await availabilityResponse.json()
+        if (availabilityResponse.ok) {
+          setAvailableSlots(availabilityData.availableSlots || [])
+        }
+      } else {
+        // Other error
+        setApiError(data.error || 'Er is iets misgegaan. Probeer het opnieuw.')
+      }
+    } catch (error) {
+      console.error('Error submitting booking:', error)
+      setApiError('Er is iets misgegaan. Probeer het opnieuw.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const generateDates = () => {
@@ -145,6 +187,13 @@ export default function BookingSystem() {
 
   return (
     <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8" role="form" aria-label="Afspraak boeken">
+      {/* API Error Display */}
+      {apiError && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700" role="alert">
+          <p className="font-medium">{apiError}</p>
+        </div>
+      )}
+
       {/* Progress Steps */}
       <nav aria-label="Boekingsstappen" className="flex items-center justify-center mb-8">
         {[1, 2, 3].map((s) => (
@@ -244,21 +293,36 @@ export default function BookingSystem() {
           {selectedDate && (
             <div className="mb-6">
               <p className="font-semibold text-neutral-900 mb-3">Tijd</p>
-              <div className="grid grid-cols-4 md:grid-cols-6 gap-2">
-                {timeSlots.map((time) => (
-                  <button
-                    key={time}
-                    onClick={() => setSelectedTime(time)}
-                    className={`py-2 px-4 rounded-lg font-medium transition-all ${
-                      selectedTime === time
-                        ? 'bg-primary-500 text-white'
-                        : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-700'
-                    }`}
-                  >
-                    {time}
-                  </button>
-                ))}
-              </div>
+              {isLoadingSlots ? (
+                <div className="flex items-center justify-center py-8">
+                  <svg className="animate-spin h-6 w-6 text-primary-500" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  <span className="ml-2 text-neutral-600">Beschikbare tijden laden...</span>
+                </div>
+              ) : availableSlots.length === 0 ? (
+                <div className="py-8 text-center text-neutral-500">
+                  <p>Geen beschikbare tijden voor deze datum.</p>
+                  <p className="text-sm mt-1">Kies een andere datum.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-4 md:grid-cols-6 gap-2">
+                  {availableSlots.map((time) => (
+                    <button
+                      key={time}
+                      onClick={() => setSelectedTime(time)}
+                      className={`py-2 px-4 rounded-lg font-medium transition-all ${
+                        selectedTime === time
+                          ? 'bg-primary-500 text-white'
+                          : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-700'
+                      }`}
+                    >
+                      {time}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
@@ -343,7 +407,7 @@ export default function BookingSystem() {
                     ? 'border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-200'
                     : 'border-neutral-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200'
                 }`}
-                placeholder="je@email.nl (optioneel)"
+                placeholder="je@email.nl (optioneel, voor bevestiging)"
               />
               {errors.email && <p className="text-red-500 text-sm mt-1" role="alert" aria-live="polite">{errors.email}</p>}
             </div>
@@ -416,6 +480,7 @@ export default function BookingSystem() {
               setSelectedTime('')
               setFormData({ name: '', email: '', phone: '', notes: '' })
               setErrors({})
+              setApiError(null)
             }}
             className="btn-secondary"
           >
