@@ -11,7 +11,7 @@ export default function PortfolioPage() {
   const portfolioImages = [
     { src: '/images/salon-interior.png', alt: 'HairsalonX interieur' },
     { src: '/images/hairstyle-curls.png', alt: 'Prachtige krullen' },
-    { src: '/images/josje-portrait.png', alt: 'Josje aan het werk' },
+    { src: '/images/josje-portrait.jpg', alt: 'Josje aan het werk' },
   ]
 
   return (

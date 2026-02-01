@@ -93,37 +93,10 @@ function AboutPreview() {
     <section className="section-padding bg-gradient-to-br from-primary-50 to-blush-light">
       <div className="container-narrow mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-<<<<<<< HEAD
-          <div className="aspect-[4/5] relative rounded-2xl overflow-hidden">
-            <Image
-              src="/images/josje-portrait.jpg"
-              alt="Josje - eigenaar van HairsalonX"
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 50vw"
-              priority
-            />
-          </div>
-          <div>
-            <p className="text-gold font-display italic text-lg mb-2">Het verhaal</p>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-neutral-900 mb-6">
-              Achter HairsalonX staat Josje
-            </h2>
-            <p className="text-neutral-600 leading-relaxed mb-4">
-              Een trotse mama met een grote passie voor het vak. Mensen mooi maken — dát is wat ze het allerliefste doet.
-            </p>
-            <p className="text-neutral-600 leading-relaxed mb-8">
-              Iedereen verdient het om zich zelfverzekerd en in de watten gelegd te voelen, en daar zet zij zich elke dag met liefde voor in.
-            </p>
-            <Link href="/over" className="btn-secondary">
-              Lees meer over Josje
-            </Link>
-          </div>
-=======
           <FadeInOnScroll direction="left">
             <div className="aspect-[4/5] relative rounded-2xl overflow-hidden hover-scale">
               <Image
-                src="/images/josje-portrait.png"
+                src="/images/josje-portrait.jpg"
                 alt="Josje - eigenaar van HairsalonX"
                 fill
                 className="object-cover"
@@ -149,7 +122,6 @@ function AboutPreview() {
               </Link>
             </div>
           </FadeInOnScroll>
->>>>>>> 25f5305 (feat: Add UX animations - scroll effects, hover states, page transitions)
         </div>
       </div>
     </section>
