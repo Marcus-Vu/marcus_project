@@ -31,16 +31,17 @@ export default function PortfolioPage() {
 
       <section className="section-padding bg-white">
         <div className="container-narrow mx-auto">
-          {/* AI-generated portfolio images */}
+          {/* Portfolio images */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-12">
             {portfolioImages.map((img, i) => (
-              <div key={i} className="aspect-square relative rounded-xl overflow-hidden">
+              <div key={i} className="aspect-square relative rounded-xl overflow-hidden hover-scale">
                 <Image
                   src={img.src}
                   alt={img.alt}
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 50vw, 33vw"
+                  loading={i < 2 ? "eager" : "lazy"}
                 />
               </div>
             ))}
