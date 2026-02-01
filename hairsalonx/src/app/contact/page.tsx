@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import GoogleMaps from '@/components/GoogleMaps'
-import BookingSystem from '@/components/BookingSystem'
 
 export const metadata: Metadata = {
   title: 'Contact & Boeken — HairsalonX | Kapper Roermond',
@@ -22,15 +21,24 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* Online Booking System */}
+      {/* Online Booking Widget */}
       <section className="section-padding bg-white">
         <div className="container-narrow mx-auto">
           <div className="text-center mb-8">
             <h2 className="font-display text-3xl font-bold text-neutral-900 mb-2">Online Afspraak Maken</h2>
             <p className="text-neutral-600">Boek direct je afspraak in 3 simpele stappen</p>
           </div>
-          <div className="max-w-2xl mx-auto">
-            <BookingSystem />
+          <div className="max-w-2xl mx-auto bg-neutral-50 rounded-2xl p-6">
+            {/* SalonBooker Widget Embed */}
+            <iframe
+              src="https://salonbooker-demo.vercel.app/widget/hairsalonx-roermond"
+              className="w-full h-[600px] border-0 rounded-xl"
+              title="Boek een afspraak bij HairsalonX"
+              loading="lazy"
+            />
+            <p className="text-center text-neutral-400 text-sm mt-4">
+              Powered by <a href="https://salonbooker.nl" target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:underline">SalonBooker</a>
+            </p>
           </div>
         </div>
       </section>
