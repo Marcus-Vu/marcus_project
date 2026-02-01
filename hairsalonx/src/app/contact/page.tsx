@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import GoogleMaps from '@/components/GoogleMaps'
+import BookingSystem from '@/components/BookingSystem'
 
 export const metadata: Metadata = {
   title: 'Contact & Boeken — HairsalonX | Kapper Roermond',
@@ -21,7 +22,20 @@ export default function ContactPage() {
         </div>
       </section>
 
+      {/* Online Booking System */}
       <section className="section-padding bg-white">
+        <div className="container-narrow mx-auto">
+          <div className="text-center mb-8">
+            <h2 className="font-display text-3xl font-bold text-neutral-900 mb-2">Online Afspraak Maken</h2>
+            <p className="text-neutral-600">Boek direct je afspraak in 3 simpele stappen</p>
+          </div>
+          <div className="max-w-2xl mx-auto">
+            <BookingSystem />
+          </div>
+        </div>
+      </section>
+
+      <section className="section-padding bg-neutral-50">
         <div className="container-narrow mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             {/* Contact info */}
