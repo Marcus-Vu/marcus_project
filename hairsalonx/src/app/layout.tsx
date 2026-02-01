@@ -45,8 +45,14 @@ export default function RootLayout({
     <html lang="nl" className={`${playfair.variable} ${lato.variable}`}>
       <body>
         <StructuredData />
+        <a 
+          href="#main-content" 
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-primary-500 focus:text-white focus:px-4 focus:py-2 focus:rounded-lg"
+        >
+          Sla navigatie over en ga naar content
+        </a>
         <Navbar />
-        <main>{children}</main>
+        <main id="main-content" tabIndex={-1}>{children}</main>
         <Footer />
         <WhatsAppButton />
         <CookieConsent />

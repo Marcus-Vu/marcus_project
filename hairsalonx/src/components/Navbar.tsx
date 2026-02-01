@@ -15,9 +15,9 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm shadow-sm">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm shadow-sm" role="navigation" aria-label="Hoofdnavigatie">
       <div className="container-narrow mx-auto flex items-center justify-between py-4 px-4 md:px-8">
-        <Link href="/" className="font-display text-2xl font-bold text-primary-600">
+        <Link href="/" className="font-display text-2xl font-bold text-primary-600" aria-label="HairsalonX - Ga naar home">
           HairsalonX
         </Link>
 
@@ -41,17 +41,19 @@ export default function Navbar() {
         <button
           className="md:hidden flex flex-col gap-1.5 p-2"
           onClick={() => setIsOpen(!isOpen)}
-          aria-label="Menu"
+          aria-label={isOpen ? "Sluit menu" : "Open menu"}
+          aria-expanded={isOpen}
+          aria-controls="mobile-menu"
         >
-          <span className={`block w-6 h-0.5 bg-neutral-800 transition-transform ${isOpen ? 'rotate-45 translate-y-2' : ''}`} />
-          <span className={`block w-6 h-0.5 bg-neutral-800 transition-opacity ${isOpen ? 'opacity-0' : ''}`} />
-          <span className={`block w-6 h-0.5 bg-neutral-800 transition-transform ${isOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+          <span className={`block w-6 h-0.5 bg-neutral-800 transition-transform ${isOpen ? 'rotate-45 translate-y-2' : ''}`} aria-hidden="true" />
+          <span className={`block w-6 h-0.5 bg-neutral-800 transition-opacity ${isOpen ? 'opacity-0' : ''}`} aria-hidden="true" />
+          <span className={`block w-6 h-0.5 bg-neutral-800 transition-transform ${isOpen ? '-rotate-45 -translate-y-2' : ''}`} aria-hidden="true" />
         </button>
       </div>
 
       {/* Mobile menu */}
       {isOpen && (
-        <div className="md:hidden bg-white border-t border-neutral-100 px-4 pb-6">
+        <div id="mobile-menu" className="md:hidden bg-white border-t border-neutral-100 px-4 pb-6" role="menu">
           {navLinks.map((link) => (
             <Link
               key={link.href}
