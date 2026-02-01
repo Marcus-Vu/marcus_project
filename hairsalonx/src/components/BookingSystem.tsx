@@ -144,24 +144,31 @@ export default function BookingSystem() {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+    <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8" role="form" aria-label="Afspraak boeken">
       {/* Progress Steps */}
-      <div className="flex items-center justify-center mb-8">
+      <nav aria-label="Boekingsstappen" className="flex items-center justify-center mb-8">
         {[1, 2, 3].map((s) => (
           <div key={s} className="flex items-center">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
-              step >= s ? 'bg-primary-500 text-white' : 'bg-neutral-200 text-neutral-500'
-            }`}>
+            <div 
+              className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
+                step >= s ? 'bg-primary-500 text-white' : 'bg-neutral-200 text-neutral-500'
+              }`}
+              aria-current={step === s ? 'step' : undefined}
+              aria-label={`Stap ${s} ${step > s ? '(voltooid)' : step === s ? '(huidig)' : ''}`}
+            >
               {s}
             </div>
             {s < 3 && (
-              <div className={`w-16 h-1 mx-2 ${
-                step > s ? 'bg-primary-500' : 'bg-neutral-200'
-              }`} />
+              <div 
+                className={`w-16 h-1 mx-2 ${
+                  step > s ? 'bg-primary-500' : 'bg-neutral-200'
+                }`}
+                aria-hidden="true"
+              />
             )}
           </div>
         ))}
-      </div>
+      </nav>
 
       {/* Step 1: Service Selection */}
       {step === 1 && (
@@ -300,7 +307,7 @@ export default function BookingSystem() {
                 }`}
                 placeholder="Je volledige naam"
               />
-              {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+              {errors.name && <p className="text-red-500 text-sm mt-1" role="alert" aria-live="polite">{errors.name}</p>}
             </div>
 
             <div>
@@ -319,7 +326,7 @@ export default function BookingSystem() {
                 }`}
                 placeholder="06 1234 5678"
               />
-              {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
+              {errors.phone && <p className="text-red-500 text-sm mt-1" role="alert" aria-live="polite">{errors.phone}</p>}
             </div>
 
             <div>
@@ -338,7 +345,7 @@ export default function BookingSystem() {
                 }`}
                 placeholder="je@email.nl (optioneel)"
               />
-              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+              {errors.email && <p className="text-red-500 text-sm mt-1" role="alert" aria-live="polite">{errors.email}</p>}
             </div>
 
             <div>

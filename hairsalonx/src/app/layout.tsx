@@ -6,6 +6,7 @@ import Footer from '@/components/Footer'
 import WhatsAppButton from '@/components/WhatsAppButton'
 import CookieConsent from '@/components/CookieConsent'
 import StructuredData from '@/components/StructuredData'
+import ErrorBoundary from '@/components/ErrorBoundary'
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -52,7 +53,9 @@ export default function RootLayout({
           Sla navigatie over en ga naar content
         </a>
         <Navbar />
-        <main id="main-content" tabIndex={-1}>{children}</main>
+        <ErrorBoundary>
+          <main id="main-content" tabIndex={-1}>{children}</main>
+        </ErrorBoundary>
         <Footer />
         <WhatsAppButton />
         <CookieConsent />
