@@ -50,6 +50,15 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-neutral-800 mt-12 pt-8 text-center text-neutral-500 text-sm">
+          <div className="flex flex-wrap justify-center gap-4 mb-4">
+            <Link href="/privacy" className="hover:text-primary-400 transition-colors">
+              Privacybeleid
+            </Link>
+            <span className="text-neutral-700">|</span>
+            <Link href="/voorwaarden" className="hover:text-primary-400 transition-colors">
+              Algemene Voorwaarden
+            </Link>
+          </div>
           <p>&copy; {new Date().getFullYear()} HairsalonX. Alle rechten voorbehouden.</p>
         </div>
       </div>
