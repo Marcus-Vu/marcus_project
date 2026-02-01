@@ -54,8 +54,8 @@ const config: Config = {
         },
       },
       fontFamily: {
-        display: ['Playfair Display', 'serif'],
-        body: ['Lato', 'sans-serif'],
+        display: ['var(--font-playfair)', 'Playfair Display', 'serif'],
+        body: ['var(--font-lato)', 'Lato', 'sans-serif'],
       },
     },
   },

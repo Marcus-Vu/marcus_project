@@ -1,9 +1,25 @@
 import type { Metadata } from 'next'
+import { Playfair_Display, Lato } from 'next/font/google'
 import './globals.css'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import WhatsAppButton from '@/components/WhatsAppButton'
 import StructuredData from '@/components/StructuredData'
+
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-playfair',
+  weight: ['400', '500', '600', '700'],
+  style: ['normal', 'italic'],
+})
+
+const lato = Lato({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-lato',
+  weight: ['300', '400', '700', '900'],
+})
 
 export const metadata: Metadata = {
   title: 'HairsalonX — Haar zoals je het nog niet kende | Kapper Roermond',
@@ -25,7 +41,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="nl">
+    <html lang="nl" className={`${playfair.variable} ${lato.variable}`}>
       <body>
         <StructuredData />
         <Navbar />
