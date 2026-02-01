@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -12,11 +13,15 @@ export default function OverPage() {
       <section className="section-padding bg-gradient-to-br from-primary-50 to-blush-light">
         <div className="container-narrow mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div className="aspect-[4/5] bg-neutral-200 rounded-2xl flex items-center justify-center order-2 md:order-1">
-              <div className="text-center text-neutral-400">
-                <span className="text-6xl block mb-4">💇‍♀️</span>
-                <p className="text-sm">Foto van Josje</p>
-              </div>
+            <div className="aspect-[4/5] relative rounded-2xl overflow-hidden order-2 md:order-1">
+              <Image
+                src="/images/josje-portrait.png"
+                alt="Josje - eigenaar van HairsalonX"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+                priority
+              />
             </div>
             <div className="order-1 md:order-2">
               <p className="text-gold font-display italic text-lg mb-2">Over mij</p>
