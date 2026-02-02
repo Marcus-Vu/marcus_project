@@ -43,6 +43,7 @@ export default function BookingSystem() {
   const [selectedDate, setSelectedDate] = useState('')
   const [selectedTime, setSelectedTime] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [formData, setFormData] = useState({
     name: '',
@@ -91,31 +92,34 @@ export default function BookingSystem() {
     if (!validateForm()) return
     
     setIsSubmitting(true)
+    setSubmitError(null)
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
-    // TODO: Replace with actual API call
-    // const response = await fetch('/api/bookings', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({
-    //     service: selectedService,
-    //     date: selectedDate,
-    //     time: selectedTime,
-    //     customer: formData
-    //   })
-    // })
-    
-    console.log('Booking submitted:', {
-      service: selectedService,
-      date: selectedDate,
-      time: selectedTime,
-      customer: formData
-    })
-    
-    setIsSubmitting(false)
-    setStep(4)
+    try {
+      const response = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          service: selectedService,
+          date: selectedDate,
+          time: selectedTime,
+          customer: formData
+        })
+      })
+      
+      const result = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Er is een fout opgetreden')
+      }
+      
+      console.log('Booking submitted successfully:', result)
+      setStep(4)
+    } catch (error: any) {
+      console.error('Booking error:', error)
+      setSubmitError(error.message || 'Er is een fout opgetreden bij het maken van de afspraak. Probeer het opnieuw of neem telefonisch contact op.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const generateDates = () => {
@@ -291,6 +295,12 @@ export default function BookingSystem() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {submitError && (
+              <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700" role="alert" aria-live="polite">
+                <p className="font-medium">Er is een fout opgetreden</p>
+                <p className="text-sm">{submitError}</p>
+              </div>
+            )}
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-1">Naam *</label>
               <input

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { FadeInOnScroll } from '@/components/FadeInOnScroll'
+import GoogleReviews from '@/components/GoogleReviews'
 
 function HeroSection() {
   return (
@@ -171,40 +172,6 @@ function ServicesPreview() {
   )
 }
 
-function ReviewsSection() {
-  const reviews = [
-    { name: 'Anna M.', text: 'Eindelijk iemand die mijn krullen begrijpt! Josje is een topper.', stars: 5 },
-    { name: 'Lisa V.', text: 'Super persoonlijke aandacht. Voelde me meteen op mijn gemak.', stars: 5 },
-    { name: 'Sophie K.', text: 'Mijn extensions zien er zo natuurlijk uit. Heel blij!', stars: 5 },
-  ]
-
-  return (
-    <section className="section-padding bg-neutral-900 text-white">
-      <div className="container-narrow mx-auto text-center">
-        <FadeInOnScroll>
-          <p className="text-gold font-display italic text-lg mb-2">Wat klanten zeggen</p>
-          <h2 className="font-display text-3xl md:text-4xl font-bold mb-12">
-            Reviews
-          </h2>
-        </FadeInOnScroll>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {reviews.map((review, index) => (
-            <FadeInOnScroll key={review.name} delay={index * 150}>
-              <div className="bg-neutral-800 rounded-2xl p-8 hover-lift h-full">
-                <div className="text-gold text-xl mb-4">
-                  {'★'.repeat(review.stars)}
-                </div>
-                <p className="text-neutral-300 italic mb-4 leading-relaxed">&ldquo;{review.text}&rdquo;</p>
-                <p className="font-semibold text-white">{review.name}</p>
-              </div>
-            </FadeInOnScroll>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
 function CTASection() {
   return (
     <section className="section-padding bg-gradient-to-br from-primary-500 to-primary-700 text-white text-center">
@@ -249,7 +216,7 @@ export default function Home() {
       <USPSection />
       <AboutPreview />
       <ServicesPreview />
-      <ReviewsSection />
+      <GoogleReviews />
       <CTASection />
     </>
   )
