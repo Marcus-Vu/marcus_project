@@ -57,6 +57,10 @@ export default function Footer() {
               Privacybeleid
             </Link>
             <span className="text-neutral-700" aria-hidden="true">|</span>
+            <Link href="/cookies" className="hover:text-primary-400 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-neutral-900 rounded px-2">
+              Cookiebeleid
+            </Link>
+            <span className="text-neutral-700" aria-hidden="true">|</span>
             <Link href="/voorwaarden" className="hover:text-primary-400 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-neutral-900 rounded px-2">
               Algemene Voorwaarden
             </Link>
