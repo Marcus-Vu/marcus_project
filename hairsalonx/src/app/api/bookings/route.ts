@@ -1,122 +1,174 @@
-import { NextResponse } from 'next/server'
+/**
+ * HAIRSALONX BOOKING API - POST /api/bookings
+ * 
+ * Creates a new booking in the database and sends confirmation emails.
+ * 
+ * REQUEST BODY:
+ * {
+ *   service: {
+ *     name: string,
+ *     duration?: number,  // in minutes
+ *     price?: number
+ *   },
+ *   date: string,         // YYYY-MM-DD
+ *   time: string,         // HH:MM
+ *   customer: {
+ *     name: string,
+ *     phone: string,
+ *     email?: string,
+ *     notes?: string
+ *   }
+ * }
+ * 
+ * RESPONSE:
+ * - 201: Booking created successfully
+ * - 400: Invalid request data
+ * - 409: Time slot already booked
+ * - 500: Server error
+ * 
+ * SIDE EFFECTS:
+ * - Creates record in 'bookings' table
+ * - Sends confirmation email to customer (if email provided)
+ * - Sends notification email to admin (info@hairsalonx.nl)
+ */
 
-// Booking API Route
-// Saves bookings to Supabase and sends email notification
+import { NextRequest, NextResponse } from 'next/server'
+import { supabaseAdmin } from '@/lib/supabase'
+import { sendCustomerConfirmation, sendAdminNotification } from '@/lib/resend'
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { service, date, time, customer } = body
-
+    
     // Validate required fields
-    if (!service || !date || !time || !customer?.name || !customer?.phone) {
+    const { service, date, time, customer } = body
+    
+    if (!service?.name || !date || !time || !customer?.name || !customer?.phone) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       )
     }
 
-    // Create booking object
-    const booking = {
-      id: generateBookingId(),
-      service: service.name,
-      duration: service.duration,
-      price: service.price,
-      date,
-      time,
-      customerName: customer.name,
-      customerPhone: customer.phone,
-      customerEmail: customer.email || null,
-      notes: customer.notes || null,
-      status: 'pending',
-      createdAt: new Date().toISOString(),
+    // Validate date format (YYYY-MM-DD)
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/
+    if (!dateRegex.test(date)) {
+      return NextResponse.json(
+        { error: 'Invalid date format. Use YYYY-MM-DD' },
+        { status: 400 }
+      )
     }
 
-    // Try to save to Supabase if configured
-    const supabaseUrl = process.env.SUPABASE_URL
-    const supabaseKey = process.env.SUPABASE_ANON_KEY
-    
-    if (supabaseUrl && supabaseKey && 
-        supabaseUrl !== 'your_supabase_url_here' && 
-        supabaseKey !== 'your_supabase_anon_key_here') {
-      try {
-        const { createClient } = await import('@supabase/supabase-js')
-        const supabase = createClient(supabaseUrl, supabaseKey)
-        
-        const { error } = await supabase
-          .from('bookings')
-          .insert([booking])
-        
-        if (error) {
-          console.error('Supabase error:', error)
-        }
-      } catch (dbError) {
-        console.error('Database error:', dbError)
+    // Validate time format (HH:MM)
+    const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/
+    if (!timeRegex.test(time)) {
+      return NextResponse.json(
+        { error: 'Invalid time format. Use HH:MM' },
+        { status: 400 }
+      )
+    }
+
+    // Check if time slot is already booked
+    // This prevents double bookings for the same date + time
+    const { data: existingBooking, error: checkError } = await supabaseAdmin
+      .from('bookings')
+      .select('id')
+      .eq('booking_date', date)
+      .eq('booking_time', time + ':00')  // Add seconds for TIME type
+      .neq('status', 'cancelled')         // Ignore cancelled bookings
+      .single()
+
+    if (checkError && checkError.code !== 'PGRST116') {
+      // PGRST116 = no rows found (which is what we want)
+      console.error('Error checking existing booking:', checkError)
+      return NextResponse.json(
+        { error: 'Failed to check availability' },
+        { status: 500 }
+      )
+    }
+
+    if (existingBooking) {
+      return NextResponse.json(
+        { error: 'This time slot is already booked' },
+        { status: 409 }
+      )
+    }
+
+    // Parse duration from string (e.g., "45 min" -> 45)
+    let duration: number | null = null
+    if (service.duration) {
+      const durationMatch = String(service.duration).match(/(\d+)/)
+      if (durationMatch) {
+        duration = parseInt(durationMatch[1], 10)
       }
     }
 
-    // Try to send email notification if Resend is configured
-    const resendKey = process.env.RESEND_API_KEY
-    if (resendKey && resendKey !== 'your_resend_api_key_here') {
-      try {
-        const { Resend } = await import('resend')
-        const resend = new Resend(resendKey)
-        
-        await resend.emails.send({
-          from: process.env.EMAIL_FROM || 'boekingen@hairsalonx.nl',
-          to: process.env.EMAIL_TO || 'info@hairsalonx.nl',
-          subject: `Nieuwe afspraak: ${customer.name} - ${service.name}`,
-          html: generateEmailTemplate(booking),
-        })
-      } catch (emailError) {
-        console.error('Email error:', emailError)
+    // Parse price from string (e.g., "€35" -> 35.00)
+    let price: number | null = null
+    if (service.price && service.price !== 'Op aanvraag') {
+      const priceMatch = String(service.price).match(/[\d,.]+/)
+      if (priceMatch) {
+        price = parseFloat(priceMatch[0].replace(',', '.'))
       }
     }
 
-    // Log booking (always works, even without external services)
-    console.log('Booking received:', booking)
+    // Insert booking into database
+    const { data: booking, error: insertError } = await supabaseAdmin
+      .from('bookings')
+      .insert({
+        service_name: service.name,
+        service_duration: duration,
+        service_price: price,
+        booking_date: date,
+        booking_time: time + ':00',  // Add seconds for TIME type
+        customer_name: customer.name,
+        customer_phone: customer.phone,
+        customer_email: customer.email || null,
+        notes: customer.notes || null,
+        status: 'pending'
+      })
+      .select()
+      .single()
 
-    return NextResponse.json({
-      success: true,
-      bookingId: booking.id,
-      message: 'Afspraak succesvol ontvangen. Je ontvangt een bevestiging.',
-    })
-  } catch (error) {
-    console.error('Booking error:', error)
+    if (insertError) {
+      console.error('Error creating booking:', insertError)
+      return NextResponse.json(
+        { error: 'Failed to create booking' },
+        { status: 500 }
+      )
+    }
+
+    // Send confirmation emails (don't fail if email fails)
+    try {
+      await Promise.all([
+        sendCustomerConfirmation(booking),
+        sendAdminNotification(booking)
+      ])
+    } catch (emailError) {
+      console.error('Error sending emails:', emailError)
+      // Don't return error - booking is still created
+    }
+
     return NextResponse.json(
-      { error: 'Failed to process booking' },
+      { 
+        success: true, 
+        booking: {
+          id: booking.id,
+          service_name: booking.service_name,
+          booking_date: booking.booking_date,
+          booking_time: booking.booking_time,
+          customer_name: booking.customer_name,
+          status: booking.status
+        }
+      },
+      { status: 201 }
+    )
+
+  } catch (error) {
+    console.error('Error in POST /api/bookings:', error)
+    return NextResponse.json(
+      { error: 'Internal server error' },
       { status: 500 }
     )
   }
-}
-
-function generateBookingId(): string {
-  const timestamp = Date.now().toString(36).toUpperCase()
-  const random = Math.random().toString(36).substring(2, 6).toUpperCase()
-  return `HSX-${timestamp}-${random}`
-}
-
-function generateEmailTemplate(booking: any): string {
-  return `
-    <h2>Nieuwe afspraak bij HairsalonX</h2>
-    <p><strong>Boeking ID:</strong> ${booking.id}</p>
-    <hr />
-    <h3>Behandeling</h3>
-    <p><strong>Service:</strong> ${booking.service}</p>
-    <p><strong>Duur:</strong> ${booking.duration}</p>
-    <p><strong>Prijs:</strong> ${booking.price}</p>
-    <hr />
-    <h3>Datum & Tijd</h3>
-    <p><strong>Datum:</strong> ${booking.date}</p>
-    <p><strong>Tijd:</strong> ${booking.time}</p>
-    <hr />
-    <h3>Klantgegevens</h3>
-    <p><strong>Naam:</strong> ${booking.customerName}</p>
-    <p><strong>Telefoon:</strong> ${booking.customerPhone}</p>
-    ${booking.customerEmail ? `<p><strong>Email:</strong> ${booking.customerEmail}</p>` : ''}
-    ${booking.notes ? `<p><strong>Opmerkingen:</strong> ${booking.notes}</p>` : ''}
-    <hr />
-    <p><strong>Status:</strong> ${booking.status}</p>
-    <p><strong>Aangemaakt op:</strong> ${new Date(booking.createdAt).toLocaleString('nl-NL')}</p>
-  `
 }
