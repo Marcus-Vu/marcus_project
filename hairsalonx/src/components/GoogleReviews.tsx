@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { FadeInOnScroll } from '@/components/FadeInOnScroll'
 
 interface Review {
@@ -111,9 +112,11 @@ export default function GoogleReviews() {
                 </p>
                 <div className="flex items-center gap-3">
                   {review.photo && (
-                    <img 
-                      src={review.photo} 
+                    <Image
+                      src={review.photo}
                       alt={review.name}
+                      width={32}
+                      height={32}
                       className="w-8 h-8 rounded-full"
                     />
                   )}
