@@ -39,10 +39,28 @@ export const supabaseAdmin = supabaseUrl && supabaseServiceKey
   ? createClient(supabaseUrl, supabaseServiceKey)
   : supabaseClient
 
+// Database schema for multi-tenant salons table:
+/*
+CREATE TABLE salons (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug TEXT UNIQUE NOT NULL,            -- URL-friendly identifier (e.g., 'demo-salon')
+  name TEXT NOT NULL,
+  email TEXT,
+  phone TEXT,
+  address TEXT,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Insert demo salon
+INSERT INTO salons (slug, name, email) 
+VALUES ('demo-salon', 'Demo Salon', 'info@demo-salon.com');
+*/
+
 // Database schema for bookings table:
 /*
 CREATE TABLE bookings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  salon_id UUID REFERENCES salons(id) ON DELETE CASCADE,
   service_name TEXT NOT NULL,
   service_duration INTEGER,           -- Duration in minutes
   service_price DECIMAL(10,2),        -- Price in euros
@@ -61,4 +79,10 @@ CREATE INDEX idx_bookings_date ON bookings(booking_date);
 
 -- Index for status queries
 CREATE INDEX idx_bookings_status ON bookings(status);
+
+-- Index for salon-based queries
+CREATE INDEX idx_bookings_salon ON bookings(salon_id);
+
+-- Composite index for availability queries
+CREATE INDEX idx_bookings_salon_date ON bookings(salon_id, booking_date);
 */

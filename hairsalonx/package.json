@@ -25,6 +25,7 @@
     "postcss": "^8.4.0",
     "sharp": "^0.34.5",
     "tailwindcss": "^3.4.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vercel": "^50.10.2"
   }
 }
