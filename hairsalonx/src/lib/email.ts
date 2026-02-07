@@ -109,7 +109,7 @@ export async function sendEmail({
   to,
   template,
   data,
-  from = process.env.EMAIL_FROM || 'noreply@hairsalonx.nl',
+  from = process.env.EMAIL_FROM || 'onboarding@resend.dev',
 }: {
   to: string;
   template: keyof typeof emailTemplates;
