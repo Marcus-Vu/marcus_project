@@ -24,12 +24,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Send email
+    // Send email - force test domain to avoid verification issues
     const result = await sendEmail({
       to,
       template,
       data: data || {},
-      from,
+      from: 'onboarding@resend.dev', // Hardcoded test domain
     });
 
     if (!result.success) {
